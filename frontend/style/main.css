@@ -85,7 +85,7 @@ body {
 	p.question {
 		margin: 0px;
 		padding-top: 5px;
-		font-size: 18px;
+		font-size: 15px;
 		color: #444;
 		text-align: right;
 	}
@@ -101,6 +101,11 @@ body {
 	#questions .answer {
 		vertical-align: top;
 	}
+
+    #questions .infotext {
+        display: inline-block;
+        margin-left: 20px;
+    }
 
 		#questions .answer label {
 			width: 64px;
@@ -163,6 +168,24 @@ body {
 	border: 2px solid #fff;
 	display: inline-block;
 	vertical-align: top;
+}
+
+.popover .party {
+    margin: 0px 0px 20px 0px;
+
+}
+
+.popover .party img {
+    margin: 4px 5px 5px 0px;
+    float: left;
+}
+
+.popover .party .pname {
+    font-weight: bold;
+}
+
+.popover .party .panswer {
+    width: 100%;
 }
 
 #chartwrapper {

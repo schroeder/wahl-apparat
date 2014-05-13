@@ -1,5 +1,5 @@
 $(function () {
-	setTimeout(init, 1);
+	setTimeout(initWA, 1);
 });
 
 var parameters = new Parameters();
@@ -8,8 +8,11 @@ var pcount = 0;
 var parteiWider = 52;
 var parteiWidth = 20;
 var form;
+//var domain = 'http://apps.opendatacity.de/wahl/';
+var domain = '';
+var numberPartysDisplayInitial = 5;
 
-function init() {
+function initWA() {
 	setTimeout(function () {
 		if ($('body').scrollTop() < 300) $('html, body').animate({ scrollTop: 300 }, 500)
 	}, 1000);
@@ -32,17 +35,20 @@ function init() {
 		var html =
 			'<div class="questionbox clearfix" name="questionbox_'+index+'" >'+
 				'<div class="form-group">'+
-					'<div class="col-sm-7 col-md-8">'+
+					'<div class="col-sm-7 col-md-7">'+
 						'<p class="question">'+text+'</p>'+
 					'</div>'+
-					'<div class="col-sm-5 col-md-4 answer-col">'+
+					'<div class="col-sm-5 col-md-5 answer-col">'+
 						'<div class="btn-group answer" data-toggle="buttons">'+
 							'<label id="label_'+index+'_1"  class="btn btn-default label_'+index+'"><input type="radio" name="answer_'+index+'" id="answer_'+index+'_1"  value="1" ><!--<span class="glyphicon glyphicon-thumbs-up"></span>--> Ja</label>'+
-							'<label id="label_'+index+'_0"  class="btn btn-default label_'+index+'"><input type="radio" name="answer_'+index+'" id="answer_'+index+'_0"  value="0" >Egal</label>'+
+							'<label id="label_'+index+'_0"  class="btn btn-default label_'+index+'"><input type="radio" name="answer_'+index+'" id="answer_'+index+'_0"  value="0" >Neutral</label>'+
 							'<label id="label_'+index+'_-1" class="btn btn-default label_'+index+'"><input type="radio" name="answer_'+index+'" id="answer_'+index+'_-1" value="-1">Nein <!--<span class="glyphicon glyphicon-thumbs-down"></span>--></label>'+
 						'</div>'+
 						'<div class="important" data-toggle="buttons">'+
 							'<label class="btn btn-default" id="important_'+index+'"><input type="checkbox" name="important_'+index+'"><span class="glyphicon glyphicon-star"></span></label>'+
+						'</div>'+
+						'<div class="infotext">'+
+                        '<a data-questionid="' + index + '" id="infotext_box_' + index + '" rel="popover" data-placement="right"><img src="'+domain+'images/kommentar-icon.png" height="27px" width="28px" /></a>' + 
 						'</div>'+
 						'<div class="markerwrapper">'+
 							'<div class="markers"></div>'+
@@ -62,11 +68,49 @@ function init() {
 			placement: 'right',
 			title: 'Ist mir wichtig!'
 		});
+
+        jQuery('#infotext_box_' + index).popover({
+            placement:  'right',
+            html:       true,
+            title:      false,
+            trigger:    'hover',
+            content:    function(){
+                            var qtext = '';
+                            if (wom.thesenparteientext) {                            
+                                var questionId = jQuery(this).data('questionid');
+                                jQuery.each(wom.parteien, function (index, partei) {
+                                    partei.index = index;
+                                    var ptext = wom.thesenparteientext[questionId][index];
+                                    if (ptext != "") {
+                                        qtext += '<div class="party"><img src="' + domain +
+                                                 'images/32/' + partei.icon + 
+                                                 '"><div class="pname">' + partei.text +
+                                                 '</div><span class="panswer">' + ptext +
+                                                 '</span></div>';
+                                    }
+                                });
+                            }
+                                                        
+                            if (qtext != "") {
+                                return qtext;
+                            } else {
+                                return "<p>Es liegen keine Stellungnahmen der Parteien vor.</p>";
+                            }
+                        }
+        });
+
+        jQuery('#help-text').popover({
+            placement:  'right',
+            html:       true,
+            title:      false,
+            trigger:    'hover',
+            content:    function(){ return jQuery('#help-text-content').html(); },
+        });
 	});
 
    initChart();
 
-	readLocalData(parameters);
+    readLocalData(parameters);
 	updateFromData();
 
 	form.change(function () {
@@ -97,7 +141,7 @@ function init() {
 	})
 
 	$('#btnshare').click(function () {
-		$('#url').val('http://apps.opendatacity.de/wahl/#'+parameters.encode());
+		$('#url').val(domain+'#'+parameters.encode());
 		$('#myModal').modal();
 	})
 
@@ -201,7 +245,7 @@ function calcMatching(p) {
 		var marked = parameters.selectedParties[partei.data.index];
 		var value = 100-100*partei.distance;
 
-		wom.parteien[partei.data.index].shouldSelected = (index < 5);
+		wom.parteien[partei.data.index].shouldSelected = (index < numberPartysDisplayInitial);
 
 		partei.data.node.css('left', left + (marked ? 3 : 0));
 		left += marked ? parteiWider : parteiWidth;
@@ -234,7 +278,7 @@ function initChart() {
 				'</div>'+
 				'<div class="title">'+partei.title+' - <span>0</span>%</div>'+
 				'<div class="icon">'+
-					'<img src="images/32/'+partei.id+'.png">'+
+					'<img src="'+domain+'images/32/'+partei.id+'.png">'+
 				'</div>'+
 				'<div class="markers">'+
 					getMarker(partei)+
@@ -257,8 +301,8 @@ function initChart() {
 function getMarker (partei) {
 	html =
 		'<div class="marker" style="'+
-		'background-color:#'+partei.fill+';'+
-		'border-color:#'+(partei.stroke ? partei.stroke : partei.fill)+
+		'background-color:'+partei.fill+';'+
+		'border-color:'+(partei.stroke ? partei.stroke : partei.fill)+
 		'" title="'+partei.title+'"></div>';
 	return html;
 }

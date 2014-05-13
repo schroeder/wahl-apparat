@@ -1,35 +1,64 @@
 <?php
 
-
-$columnOffset = 5;
-
-$data = @file_get_contents('data/data.csv');
-$partyData = @file_get_contents('data/parteien.csv');
-
-$partySettings = array();
-
-$partyNames = array();
-$partyDataArray = CSVToArray($partyData, $partyNames);
-echo "<pre>";
-var_dump($partyDataArray);
-echo "</pre>";
-echo "<pre>";
-var_dump($partyNames);
-echo "</pre>";
 /*
-        $rows = $partiesData->attribute('rows');
+The MIT License (MIT)
 
-        foreach ($rows['sequential'] as $key => $row)
-        {
-            $partySettings[strtolower($row["columns"][0])] = $row["columns"];
-        }
+Copyright (c) 2014 opendatacity.de // isozaponol.de
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
 */
 
+
+/*
+
+The following code is only a demonstration how to build a valid data array with PHP.
+Do not use this code in productive systems unless you know what you are doing!
+
+*/
+
+// How many parties will be shown by default.
+$columnOffset = 5;
+// path to the party file name
+$partyFileName = 'data/parteien.csv';
+// path to the question file name
+$dataFileName = 'data/data.csv';
+
+
+/* Read the party information and build the array. */
+$partyData = @file_get_contents($partyFileName);
+$partySettings = array();
+$partyNames = array();
+$partyDataArray = CSVToArray($partyData, $partyNames);
+foreach ($partyDataArray as $key => $row)
+{
+    $partySettings[strtolower($row[0])] = $row;
+}
+
+/* Read the questions and build the array. */
+$data = @file_get_contents($dataFileName);
 $names = array();
 $dataArray = CSVToArray($data, $names);
 $np = (count($names) - $columnOffset) / 2;
 $nr = count($names);
 
+/* Now proccess the questions and form the needed array structure */
 if ($dataArray)
 {
     $thesen = array();
@@ -83,13 +112,6 @@ if ($dataArray)
         $partyList[] = strtolower($names[$i]);
     }
 
-//    $partyNameList = $electionINI->variable( 'PartySettings','PartyName' );
-//    $partyLongNameList = $electionINI->variable( 'PartySettings','PartyLongName' );
-//    $partyIconList = $electionINI->variable( 'PartySettings','PartyIcon' );
-//    $partyColorFillList = $electionINI->variable( 'PartySettings','PartyColorFill' );
-//    $partyColorStrokeList = $electionINI->variable( 'PartySettings','PartyColorStroke' );
-//    $partyInfoList = array();
-
     foreach ($partyList as $party)
     {
         $partyInfo = array();
@@ -99,13 +121,9 @@ if ($dataArray)
         /*
             Read abbr., set to content field, if set. Else use the default setting
         */
-        if ($partySettings && array_key_exists($party, $partySettings) && $partySettings[$party][0] != "")
+        if ($partySettings && array_key_exists($party, $partySettings) && $partySettings[$party][1] != "")
         {
-            $partyInfo["title"] = $partySettings[$party][0];
-        }
-        elseif (isset($partyNameList) && array_key_exists($party, $partyNameList) && $partyNameList[$party] != "")
-        {
-            $partyInfo["title"] = $partyNameList[$party];
+            $partyInfo["title"] = $partySettings[$party][1];
         }
         else
         {
@@ -115,13 +133,9 @@ if ($dataArray)
         /*
             Read party full title., set to content field, if set. Else use the default setting
         */
-        if ( isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][1] != "")
+        if ( isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][2] != "")
         {
-            $partyInfo["text"] = $partySettings[$party][1];
-        }
-        elseif ( isset($partyLongNameList) && array_key_exists($party, $partyLongNameList) && $partyLongNameList[$party] != "")
-        {
-            $partyInfo["text"] = $partyLongNameList[$party];
+            $partyInfo["text"] = $partySettings[$party][2];
         }
         else
         {
@@ -131,13 +145,9 @@ if ($dataArray)
         /*
             Read party icon name., set to content field, if set. Else use the default setting
         */
-        if ( isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][2] != "")
+        if ( isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][3] != "")
         {
-            $partyInfo["icon"] = $partySettings[$party][2];
-        }
-        elseif ( isset($partyIconList) && array_key_exists($party, $partyIconList) && $partyIconList[$party] != "")
-        {
-            $partyInfo["icon"] = $partyIconList[$party];
+            $partyInfo["icon"] = $partySettings[$party][3];
         }
         else
         {
@@ -147,29 +157,25 @@ if ($dataArray)
         /*
             Read party fill color., set to content field, if set. Else use the default setting
         */
-        if ( isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][3] != "")
+        if ( isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][4] != "")
         {
-            $partyInfo["fill"] = $partySettings[$party][3];
-        }
-        elseif (isset($partyColorFillList) && array_key_exists($party, $partyColorFillList) && $partyColorFillList[$party] != "")
-        {
-            $partyInfo["fill"] = $partyColorFillList[$party];
+            $partyInfo["fill"] = $partySettings[$party][4];
         }
         else
         {
-            $partyInfo["fill"] = "000000";
+            $partyInfo["fill"] = "#000000";
         }
 
         /*
             Read party stroke title., set to content field, if set. Else use the default setting
         */
-        if (isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][4] != "")
+        if (isset($partySettings) && array_key_exists($party, $partySettings) && $partySettings[$party][5] != "")
         {
-            $partyInfo["stroke"] = $partySettings[$party][4];
+            $partyInfo["stroke"] = $partySettings[$party][5];
         }
-        elseif (isset($partyColorStrokeList) && array_key_exists($party, $partyColorStrokeList) && $partyColorStrokeList[$party] != "")
+        else
         {
-            $partyInfo["stroke"] = $partyColorFillList[$party];
+            $partyInfo["stroke"] = $partyInfo["fill"];
         }
 
         $partyInfoList[] = $partyInfo;
@@ -177,25 +183,22 @@ if ($dataArray)
 
 }
 
+/* Convert all array to json... */
 $thesenJson = json_encode($thesen);
 $theseParteiJson = json_encode($thesePartei);
 $theseParteiTextJson = json_encode($theseParteiText);
 $partyInfoListJson = json_encode($partyInfoList);
+/* and print them. */
 echo 'var wom = {
     "thesen": ' . $thesenJson . ',
     "thesenparteien": ' . $theseParteiJson . ',
     "thesenparteientext": ' . $theseParteiTextJson . ',
     "parteien": ' . $partyInfoListJson . '
 };';
+
 exit;
 
-echo 'var wom = {
-    "thesen": [ ],
-    "thesenparteien": [ ],
-    "parteien": [ ]
-};';
-
-
+/* helper function to convert csv data to php array, put all column names into $names array. */
 function CSVToArray($csv, &$names, $delimiter = ',', $enclosure = '"', $escape = '\\', $terminator = "\n")
 { 
     $result = array(); 

@@ -1,4 +1,5 @@
 abkuerzung,name,kurzname,icon,farbe1,farbe2 
-CDU,CDU,CDU,cdu.png,#000000,
-Gruene,Die Grünen,Die Grünen,gruene.png,#579541
-FDP,FDP,FDP,fdp.png,#00FF00
+CDU,CDU,CDU,cdu.png,#190707,#190707
+Gruene,Die Gr&uuml;nen,Die Gr&uuml;nen,gruene.png,#3ADF00,#3ADF00
+FDP,FDP,FDP,fdp.png,#FFFF00,#FFFF00
+SPD,SPD,SPD,spd.png,#FF0000,#FF0000
